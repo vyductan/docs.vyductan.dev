@@ -1,0 +1,86 @@
+# Slice
+
+```typescript
+import { createContext, useContext, useRef } from "react";
+import { useStore } from "zustand";
+import { persist } from "zustand/middleware";
+import { createStore } from "zustand/vanilla";
+```
+
+```typescript
+type AppState = {
+  user: User;
+};
+type AppActions = {
+  setUser: (user: User) => void;
+};
+type AppStore = AppState & AppActions;
+
+const defaultInitState: AppState = {
+  user: {
+    id: "",
+    app_metadata: {
+      provider: "",
+    },
+    user_metadata: {
+      //
+    },
+    aud: "",
+    created_at: "",
+  },
+};
+
+const createUserStore = (initState: AppState = defaultInitState) => {
+  return createStore<AppStore>()(
+    persist(
+      (set) => ({
+        ...initState,
+        // user: undefined,
+        setUser: (user) => set({ user }),
+      }),
+      {
+        name: "user", // name of item in the storage (must be unique)
+        // storage: createJSONStorage(() => sessionStorage), // (optional) by default the 'localStorage' is used
+        partialize: (state) => ({ user: state.user }),
+      },
+    ),
+  );
+};
+
+type AppStoreApi = ReturnType<typeof createUserStore>;
+
+const AppStoreContext = createContext<AppStoreApi | undefined>(undefined);
+
+export const UserStoreProvider = ({
+  children,
+  user,
+}: {
+  children: ReactNode;
+  user: User;
+}) => {
+  const storeRef = useRef<AppStoreApi>();
+  if (!storeRef.current) {
+    storeRef.current = createUserStore({ user });
+  }
+  return (
+    <AppStoreContext.Provider value={storeRef.current}>
+      {children}
+    </AppStoreContext.Provider>
+  );
+};
+
+export function useUser(): AppStore;
+export function useUser<T>(selector: (store: AppStore) => T): T;
+export function useUser<T>(selector?: (store: AppStore) => T): T {
+  const appStoreContext = useContext(AppStoreContext);
+
+  if (!appStoreContext) {
+    throw new Error(`useUser must be used within UserStoreProvider`);
+  }
+
+  return useStore(
+    appStoreContext,
+    selector ?? ((store: AppStore) => store as T),
+  );
+}
+```

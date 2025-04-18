@@ -1,0 +1,60 @@
+# Modal
+
+```typescript
+import { Modal } from "@acme/ui/modal";
+```
+
+```tsx
+<Modal
+  title="Modal"
+  open={open}
+  onOpenChange={setOpen}
+  description="Modal description"
+  content={<div>Modal content</div>}
+  footer={<div>Modal footer</div>}
+/>
+```
+
+## Modal Form
+
+```typescript
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+
+import { Form } from "@acme/ui/form";
+import { message } from "@acme/ui/toast";
+```
+
+```tsx
+const queryClient = useQueryClient();
+const insertMutation = useMutation(
+  teamsServices.insertMembers.mutationOptions({
+    onSuccess: async () => {
+      await queryClient.invalidateQueries(teamsServices.pathFilter());
+      message.success("Members added successfully!");
+    },
+    onError: (error) => {
+      apiErrorHandling({ error, form });
+    },
+  }),
+);
+
+const form = useForm();
+
+<Modal
+  title="Modal"
+  description="Modal description"
+  open={open}
+  onOpenChange={(open) => {
+    if (!open) {
+      form.reset();
+    }
+    onOpenChange(open);
+  }}
+  onOk={async () => {
+    await form.submit();
+  }}
+  okLoading={insertMutation.isPending}
+>
+  <Form></Form>
+</Modal>;
+```

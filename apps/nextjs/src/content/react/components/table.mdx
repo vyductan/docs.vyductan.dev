@@ -1,0 +1,21 @@
+## isPlaceholderData
+
+```typescript
+isPlaceholderData: keepPreviousData
+
+Loading will be: `query.isLoading || query.isPlaceholderData`
+```
+
+```typescript
+/* Row hover (group) */
+<Table
+  classNames={{
+    row: "group",
+  }}
+  columns={[
+    {
+      render: ({ record }) => <div className="group-hover:bg-red-500">{record.name}</div>,
+    },
+  ]}
+/>
+```
