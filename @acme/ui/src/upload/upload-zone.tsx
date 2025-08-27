@@ -1,11 +1,12 @@
 import { useRef, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 
+import { cn } from "@acme/ui/lib/utils";
+
 import type { UploadFileItem, UploadService } from "./types";
-import { cn } from "..";
-import { Card } from "../card";
+import { Card } from "../components/card";
 // import { Icon } from "../icons";
-import { message } from "../toast";
+import { message } from "../components/message";
 import ProgressBar from "./_components/progress-bar";
 
 type UploadZoneProps = Omit<
@@ -90,7 +91,6 @@ const UploadZone = ({
     );
     setIsUploading(false);
     if (blob?.success) {
-      console.log("onSuccess");
       reset();
       onUploadSuccess?.({
         uid: file.name,
@@ -101,13 +101,6 @@ const UploadZone = ({
 
     // const reader = new FileReader();
     // reader.onload = async () => {
-    //   console.log(
-    //     "aaaa",
-    //     file,
-    //     typeof reader.result,
-    //     reader.result instanceof ArrayBuffer,
-    //     reader.result,
-    //   );
     //   // if (reader.result instanceof ArrayBuffer) {
     //   if (typeof reader.result === "string") {
     //     const blob = await apiUpload({
@@ -216,7 +209,6 @@ const UploadZone = ({
             className="h-full w-full object-contain"
           />
         ) : children ? (
-          // eslint-disable-next-line react-compiler/react-compiler
           <div>{children(fileInputRef, reset)}</div>
         ) : (
           <div
@@ -269,7 +261,6 @@ const UploadZone = ({
           accept="image/*"
           className="sr-only"
           onChange={async (event) => {
-            console.log("eeeeeeee", event.currentTarget);
             const file = event.currentTarget.files?.[0];
             if (file) {
               await upload(file);
